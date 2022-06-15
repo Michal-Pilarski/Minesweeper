@@ -1,0 +1,67 @@
+body{
+    background: rgb(131,58,180);
+    background: linear-gradient(90deg, rgba(131,58,180,1) 0%, rgba(253,29,29,1) 50%, rgba(252,176,69,1) 100%);
+}
+
+#container{
+    display: flex;
+    height: 90vh;
+    justify-content: center;
+    align-items: center;
+}
+
+.field{
+    width: 50vw;
+    height: 80vh;
+    background-color: aquamarine;
+    display: flex;
+    justify-content: center;
+}
+
+.info{
+    width: 100%;
+    height: 10%;
+    background-color: rgb(55, 141, 5);
+    display: flex;
+    flex-wrap: wrap;
+    align-content: space-between;
+}
+
+.select{
+    width: 20%;
+    height: 100%;
+    position: relative;
+}
+
+.select select{
+    background-color:azure;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 1.5em;
+    text-align: center;
+    width: 80%;
+    height: 50%;
+    margin: 10%;
+}
+
+.timer {
+    font-size: 1.8em;   
+    color: aliceblue;
+    width: 80%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    flex-direction: row;
+    align-items: center;
+    align-content: space-around;
+}
+
+/*gwiazdka wyciąga wszystkie elementy z diva timer*/
+.timer *{
+    padding-right: 1%;
+}
+
+.timer img{
+    width: 5%;
+    height: 60%;
+}
+
