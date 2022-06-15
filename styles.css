@@ -16,6 +16,7 @@ body{
     background-color: aquamarine;
     display: flex;
     justify-content: center;
+    flex-direction: column;
 }
 
 .info{
@@ -63,5 +64,10 @@ body{
 .timer img{
     width: 5%;
     height: 60%;
+}
+
+.tiles{
+    width: 100%;
+    height: 90%;
 }
 

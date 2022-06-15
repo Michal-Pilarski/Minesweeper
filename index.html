@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Minesweeper</title>
     <link rel="stylesheet" href="styles.css">
+    <script src="script.js" defer></script>
 </head>
 <body>
     
@@ -15,7 +16,7 @@
             <!--menu with level select, bombs remaining and time-->
             <div class="info">
                 <div class="select">
-                    <select>
+                    <select id="levels">
                         <option value="Easy">Easy</option>
                         <option value="Medium">Medium</option>
                         <option value="Hard">Hard</option>
@@ -23,12 +24,14 @@
                 </div>
                 <div class="timer">
                     <img src="images/bomb.png">
-                    <p style="padding-right: 5%;">20</p>
+                    <p class="bombs" style="padding-right: 5%;">20</p>
                     <img src="images/image.png">
-                    <p>0.00</p>
+                    <p class="time">0.00</p>
                 </div>
             </div>
-            <div class="tiles"></div>
+            <div class="tiles">
+                <!--here tiles generating by difficulty level-->
+            </div>
         </div>
 
     </div>
