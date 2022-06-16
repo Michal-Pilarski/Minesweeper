@@ -12,6 +12,7 @@ func()
 
 function func(){
     // listening on dropdown changes, means changing difficulty
+    // resetting everything under when difficulty changes
 
     // resetting tiles array, and deleting all previous tiles
     //tiles.length = 0
@@ -47,7 +48,7 @@ function func(){
             break
     }
 
-    // create 2 2d arrays, one for divs, and one for setting bombs, and numbers
+    // create two 2d arrays, one for divs, and one for setting bombs, and numbers
     // arrays a little bigger to prevent errors on clicking in border tiles
     // divTiles -> only div with click listeners
     // tiles -> bombs and numbers around
@@ -67,7 +68,8 @@ function func(){
     }
 
     // styling for divTiles
-    att = `background-color:salmon; width:${tilesSize}%; height:${tilesSize}%; float:left; border: 0.1em solid;`
+    att = `background-color:salmon; width:${tilesSize}%; height:${tilesSize}%; float:left; border: 0.1em solid; display: flex; justify-content: center; align-items: center;`
+    leftClickAtt = `background-color:gray; width:${tilesSize}%; height:${tilesSize}%; float:left; border: 0.1em solid; display: flex; justify-content: center; align-items: center;`
     //styling for flags
     attFlag = 'width: 60%; height: 70%;'
 
@@ -83,22 +85,43 @@ function func(){
             divTiles[y][x].setAttribute('style', att)
             // appending tile to area
             area.appendChild(divTiles[y][x])
-
+            
+            // flag needed to prevent mutiple flag creation
+            let bool = true
+            // flag needed to stop putting flags when tile left clicked
+            let clicked = false
             // mouse click detection
             divTiles[y][x].addEventListener('mousedown', (e) =>{
-                let bool = false
                 switch (e.button) {
-                    case 0:
+                    case 0: // left click
+                        
+                        clicked = true
+                        divTiles[y][x].removeAttribute(att)
+                        divTiles[y][x].setAttribute('style', leftClickAtt)
+                        divTiles[y][x].innerHTML = tiles[y][x]
+
                         console.log('Left mouse button clicked.', y, x)
-                        break;
-                    case 2:
-                        //making flag on right click
-                        let flag = document.createElement('img')
-                        flag.src = "images/flag_icon.png"
-                        flag.setAttribute('style', attFlag)
-                        divTiles[y][x].appendChild(flag)
+                        break
+                    case 2: // right click
+                        if(!clicked){
+                            if(bool){
+                                //making flag on right click
+                                let flag = document.createElement('img')
+                                flag.src = "images/flag_icon.png"
+                                flag.setAttribute('style', attFlag)
+                                divTiles[y][x].appendChild(flag)
+                                bool = false
+                                //flags counter
+                                bombsCount.textContent--
+                            }
+                            else{
+                                divTiles[y][x].innerHTML = ''
+                                bool = true
+                                bombsCount.textContent++
+                            }
+                        }
                         console.log('Right mouse button clicked.')
-                        break;
+                        break
                 }
             })
             
@@ -123,7 +146,7 @@ function func(){
                 if(tiles[y-1][x-1] == 'b'){num++}
                 
                 // if num = 0 we don't need to append anything to tiles arr
-                if(num>0){
+                if(num!=0){
                     tiles[y][x] = num
                 }
             }
