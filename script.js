@@ -1,4 +1,4 @@
-
+// TODO making bombs on first click, 
 // html elements and listeners
 let select = document.querySelector('#levels')
 let area = document.querySelector('.tiles')
@@ -23,6 +23,8 @@ function func(){
     let att = ''
     let howManyTiles = 0
     let tilesSize = 0
+    // flag for first mouse left click
+    let firstClick = false
 
     // defining how many tiles generate, and their size
     switch(level){
@@ -59,13 +61,6 @@ function func(){
         tiles[i] = new Array(howManyTiles+1)
     }
 
-    // randomizing bombs etc
-    for(let k=0; k<=bombsCount.textContent; k++)
-    {
-        let bombY = getRndInteger(1, howManyTiles-1)
-        let bombX = getRndInteger(1, howManyTiles-1)
-        tiles[bombY][bombX] = 'b'
-    }
 
     // styling for divTiles
     att = `background-color:salmon; width:${tilesSize}%; height:${tilesSize}%; float:left; border: 0.1em solid; display: flex; justify-content: center; align-items: center;`
@@ -90,17 +85,61 @@ function func(){
             let bool = true
             // flag needed to stop putting flags when tile left clicked
             let clicked = false
+
             // mouse click detection
             divTiles[y][x].addEventListener('mousedown', (e) =>{
                 switch (e.button) {
                     case 0: // left click
-                        
-                        clicked = true
-                        divTiles[y][x].removeAttribute(att)
-                        divTiles[y][x].setAttribute('style', leftClickAtt)
-                        divTiles[y][x].innerHTML = tiles[y][x]
-
-                        console.log('Left mouse button clicked.', y, x)
+                        if(bool){
+                            clicked = true
+                            // removing red tile and making new with tiles array value
+                            divTiles[y][x].removeAttribute(att)
+                            divTiles[y][x].setAttribute('style', leftClickAtt)
+                            divTiles[y][x].innerHTML = tiles[y][x]
+                        }
+                        if(!firstClick){
+                            // randomizing bombs and setting them in array
+                            for(let k=0; k<bombsCount.textContent; k++) // number of bombs = number of flags
+                            {   
+                                let bombY = getRndInteger(1, howManyTiles-1)
+                                let bombX = getRndInteger(1, howManyTiles-1)
+                                tiles[bombY][bombX] = 'b'
+                            }
+                            // new double loop for setting numbers only
+                            for(let y2=1; y2<howManyTiles; y2++)
+                            {   
+                                for(let x2=1; x2<howManyTiles; x2++)
+                                { 
+                                    // creating numbers around bombs (checking how many bombs are around)
+                                    if(tiles[y2][x2] != 'b'){
+                                        let num = 0
+                                        //right
+                                        if(tiles[y2][x2+1] == 'b'){num++}
+                                        //left
+                                        if(tiles[y2][x2-1] == 'b'){num++}
+                                        //down
+                                        if(tiles[y2+1][x2] == 'b'){num++}
+                                        //up
+                                        if(tiles[y2-1][x2] == 'b'){num++}
+                                        //right down
+                                        if(tiles[y2+1][x2+1] == 'b'){num++}
+                                        // right up
+                                        if(tiles[y2-1][x2+1] == 'b'){num++}
+                                        // left down
+                                        if(tiles[y2+1][x2-1] == 'b'){num++}
+                                        // left up
+                                        if(tiles[y2-1][x2-1] == 'b'){num++}
+                                        
+                                        // if num = 0 we don't need to append anything to tiles arr
+                                        if(num!=0){
+                                            tiles[y2][x2] = num
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        console.log(tiles, y, x)
+                        firstClick = true
                         break
                     case 2: // right click
                         if(!clicked){
@@ -120,36 +159,10 @@ function func(){
                                 bombsCount.textContent++
                             }
                         }
-                        console.log('Right mouse button clicked.')
                         break
                 }
             })
-            
-            // creating numbers around bombs (checking how many bombs are around)
-            if(tiles[y][x] != 'b'){
-                let num = 0
-                //right
-                if(tiles[y][x+1] == 'b'){num++}
-                //left
-                if(tiles[y][x-1] == 'b'){num++}
-                //down
-                if(tiles[y+1][x] == 'b'){num++}
-                //up
-                if(tiles[y-1][x] == 'b'){num++}
-                //right down
-                if(tiles[y+1][x+1] == 'b'){num++}
-                // right up
-                if(tiles[y-1][x+1] == 'b'){num++}
-                // left down
-                if(tiles[y+1][x-1] == 'b'){num++}
-                // left up
-                if(tiles[y-1][x-1] == 'b'){num++}
-                
-                // if num = 0 we don't need to append anything to tiles arr
-                if(num!=0){
-                    tiles[y][x] = num
-                }
-            }
+
 
 
         }
