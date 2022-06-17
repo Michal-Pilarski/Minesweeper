@@ -63,8 +63,8 @@ function func(){
 
 
     // styling for divTiles
-    att = `background-color:salmon; width:${tilesSize}%; height:${tilesSize}%; float:left; border: 0.1em solid; display: flex; justify-content: center; align-items: center;`
-    leftClickAtt = `background-color:gray; width:${tilesSize}%; height:${tilesSize}%; float:left; border: 0.1em solid; display: flex; justify-content: center; align-items: center;`
+    att = `background-color:salmon; width:${tilesSize}%; height:${tilesSize}%; float:left; border: 0.05em solid; display: flex; justify-content: center; align-items: center; `
+    leftClickAtt = `background-color:gray; width:${tilesSize}%; height:${tilesSize}%; float:left; border: 0.05em solid; display: flex; justify-content: center; align-items: center;`
     //styling for flags
     attFlag = 'width: 60%; height: 70%;'
 
@@ -90,13 +90,6 @@ function func(){
             divTiles[y][x].addEventListener('mousedown', (e) =>{
                 switch (e.button) {
                     case 0: // left click
-                        if(bool){
-                            clicked = true
-                            // removing red tile and making new with tiles array value
-                            divTiles[y][x].removeAttribute(att)
-                            divTiles[y][x].setAttribute('style', leftClickAtt)
-                            divTiles[y][x].innerHTML = tiles[y][x]
-                        }
                         if(!firstClick){
                             // randomizing bombs and setting them in array
                             for(let k=0; k<bombsCount.textContent; k++) // number of bombs = number of flags
@@ -130,16 +123,31 @@ function func(){
                                         // left up
                                         if(tiles[y2-1][x2-1] == 'b'){num++}
                                         
-                                        // if num = 0 we don't need to append anything to tiles arr
+                                        // if num = 0 we don't need to append anything to tiles arr, only delete undefined string
                                         if(num!=0){
                                             tiles[y2][x2] = num
+                                        }
+                                        else{
+                                            tiles[y2][x2] = ' '
                                         }
                                     }
                                 }
                             }
                         }
-                        console.log(tiles, y, x)
+                        if(bool){
+                            clicked = true
+                            // removing red tile and making new with tiles array value
+                            if(tiles[y][x] == ' '){
+                                revealTiles(y, x, divTiles, tiles, att, leftClickAtt)
+                            }
+                            else{
+                                clickedTile(divTiles[y][x], tiles[y][x], att, leftClickAtt)
+                            }
+                            //clickedTile(divTiles[y][x], tiles[y][x], att, leftClickAtt)
+                            //revealTiles(y, x, divTiles, tiles, att, leftClickAtt)
+                        }
                         firstClick = true
+                        console.log(tiles, y, x)
                         break
                     case 2: // right click
                         if(!clicked){
@@ -179,3 +187,75 @@ function func(){
 function getRndInteger(min, max) {
     return Math.floor(Math.random() * (max - min + 1) ) + min;
   }
+
+
+function clickedTile(divTile, tile, oldAttribute, newAttribute){
+    divTile.removeAttribute(oldAttribute)
+    divTile.setAttribute('style', newAttribute)
+    divTile.innerHTML = tile
+}
+
+// if tile without value has been hitted
+// probably need AJAX to make this work
+function revealTiles(pos_y, pos_x, divTiles, tiles, oldAttribute, newAttribute){
+    let stop = false
+    let steps = 99
+    // directions
+    // 1 - right  2 - left
+    // 3 - up   4 - down
+    let direction = 1
+
+    while(!stop){
+        console.log('petla', pos_y, pos_x)
+        switch(direction){
+            case 1:
+                if(tiles[pos_y][pos_x+1] == ' '){ //right
+                    pos_x++ 
+                    clickedTile(divTiles[pos_y][pos_x], tiles[pos_y][pos_x], oldAttribute, newAttribute)
+                    steps--
+                    console.log('right')
+                }
+                else{
+                    direction = getRndInteger(3, 4)
+                }
+                break
+            case 2: 
+                if(tiles[pos_y][pos_x-1] == ' '){ //left
+                    pos_x-- 
+                    clickedTile(divTiles[pos_y][pos_x], tiles[pos_y][pos_x], oldAttribute, newAttribute)
+                    steps--
+                }
+                else{
+                    direction = getRndInteger(3, 4)
+                }
+                break
+            case 3:
+                if(tiles[pos_y+1][pos_x1] == ' '){ // up
+                    pos_y++ 
+                    clickedTile(divTiles[pos_y][pos_x], tiles[pos_y][pos_x], oldAttribute, newAttribute)
+                    steps--
+                }
+                else{
+                    direction = getRndInteger(1, 2)
+                }
+                break
+            case 4:
+                if(tiles[pos_y-1][pos_x1] == ' '){ // down
+                    pos_y-- 
+                    clickedTile(divTiles[pos_y][pos_x], tiles[pos_y][pos_x], oldAttribute, newAttribute)
+                    steps--
+                }
+                else{
+                    direction = getRndInteger(1, 2)
+                }
+                break
+            default:
+                stop = true
+                break
+        }
+
+        if(steps >= 0){
+            stop = true
+        }
+    }
+}
