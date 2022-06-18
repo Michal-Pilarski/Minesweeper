@@ -1,4 +1,4 @@
-// TODO making bombs on first click, 
+// TODO game ending and bombs hit 
 // html elements and listeners
 let select = document.querySelector('#levels')
 let area = document.querySelector('.tiles')
@@ -23,6 +23,7 @@ function func(){
     let att = ''
     let howManyTiles = 0
     let tilesSize = 0
+    let numColor = 'black'  // color changing border too
     // flag for first mouse left click
     let firstClick = false
 
@@ -35,7 +36,7 @@ function func(){
             break
         case 'Medium':
             howManyTiles = 21
-            bombsCount.textContent = 20
+            bombsCount.textContent = 5
             tilesSize = 4
             break
         case 'Hard':
@@ -64,7 +65,7 @@ function func(){
 
     // styling for divTiles
     att = `background-color:salmon; width:${tilesSize}%; height:${tilesSize}%; float:left; border: 0.05em solid; display: flex; justify-content: center; align-items: center; `
-    leftClickAtt = `background-color:gray; width:${tilesSize}%; height:${tilesSize}%; float:left; border: 0.05em solid; display: flex; justify-content: center; align-items: center;`
+    leftClickAtt = `background-color:gray; color:${numColor}; width:${tilesSize}%; height:${tilesSize}%; float:left; border: 0.05em solid; display: flex; justify-content: center; align-items: center;`
     //styling for flags
     attFlag = 'width: 60%; height: 70%;'
 
@@ -138,10 +139,11 @@ function func(){
                             clicked = true
                             // removing red tile and making new with tiles array value
                             if(tiles[y][x] == ' '){
-                                revealTiles(y, x, divTiles, tiles, att, leftClickAtt)
+                                clickedTile(divTiles[y][x], tiles[y][x], leftClickAtt)
+                                revealTiles(y, x, divTiles, tiles, leftClickAtt)
                             }
                             else{
-                                clickedTile(divTiles[y][x], tiles[y][x], att, leftClickAtt)
+                                clickedTile(divTiles[y][x], tiles[y][x], leftClickAtt)
                             }
                             //clickedTile(divTiles[y][x], tiles[y][x], att, leftClickAtt)
                             //revealTiles(y, x, divTiles, tiles, att, leftClickAtt)
@@ -189,73 +191,106 @@ function getRndInteger(min, max) {
   }
 
 
-function clickedTile(divTile, tile, oldAttribute, newAttribute){
+function clickedTile(divTile, tile, newAttribute){
+    let oldAttribute =  divTile.getAttribute('style')
     divTile.removeAttribute(oldAttribute)
     divTile.setAttribute('style', newAttribute)
     divTile.innerHTML = tile
+
 }
 
 // if tile without value has been hitted
-// probably need AJAX to make this work
-function revealTiles(pos_y, pos_x, divTiles, tiles, oldAttribute, newAttribute){
-    let stop = false
-    let steps = 99
+// loop switching directions randomly and 'clicking' tile is not gray and if innerHTML of component is space
+// checking right, then up/down, then right/left, then up/down untill steps=0
+function revealTiles(pos_y, pos_x, divTiles, tiles, newAttribute){
+    let steps = 500
     // directions
     // 1 - right  2 - left
     // 3 - up   4 - down
     let direction = 1
 
-    while(!stop){
-        console.log('petla', pos_y, pos_x)
-        switch(direction){
-            case 1:
-                if(tiles[pos_y][pos_x+1] == ' '){ //right
-                    pos_x++ 
-                    clickedTile(divTiles[pos_y][pos_x], tiles[pos_y][pos_x], oldAttribute, newAttribute)
-                    steps--
-                    console.log('right')
-                }
-                else{
-                    direction = getRndInteger(3, 4)
-                }
-                break
-            case 2: 
-                if(tiles[pos_y][pos_x-1] == ' '){ //left
-                    pos_x-- 
-                    clickedTile(divTiles[pos_y][pos_x], tiles[pos_y][pos_x], oldAttribute, newAttribute)
-                    steps--
-                }
-                else{
-                    direction = getRndInteger(3, 4)
-                }
-                break
-            case 3:
-                if(tiles[pos_y+1][pos_x1] == ' '){ // up
-                    pos_y++ 
-                    clickedTile(divTiles[pos_y][pos_x], tiles[pos_y][pos_x], oldAttribute, newAttribute)
-                    steps--
-                }
-                else{
-                    direction = getRndInteger(1, 2)
-                }
-                break
-            case 4:
-                if(tiles[pos_y-1][pos_x1] == ' '){ // down
-                    pos_y-- 
-                    clickedTile(divTiles[pos_y][pos_x], tiles[pos_y][pos_x], oldAttribute, newAttribute)
-                    steps--
-                }
-                else{
-                    direction = getRndInteger(1, 2)
-                }
-                break
-            default:
-                stop = true
-                break
-        }
-
-        if(steps >= 0){
-            stop = true
+    while(steps>0){
+        // 8 step loop to uncover first numbers around empty tiles
+        for(let i=1; i<9; i++){
+            switch(direction){
+                case 1: //right
+                    if(tiles[pos_y][pos_x+1] == ' ' && divTiles[pos_y][pos_x+1].getAttribute('style') != 'background:gray'){ 
+                        pos_x++ 
+                        clickedTile(divTiles[pos_y][pos_x], tiles[pos_y][pos_x], newAttribute)
+                        steps--
+                        direction = getRndInteger(3, 4)
+                    }
+                    else if(tiles[pos_y][pos_x+1] == i ){
+                        pos_x++ 
+                        clickedTile(divTiles[pos_y][pos_x], tiles[pos_y][pos_x], newAttribute)
+                        pos_x--
+                        steps--
+                        direction = getRndInteger(3, 4)
+                    }
+                    else{
+                        direction = getRndInteger(3, 4)
+                    }
+                    break
+                case 2: //left
+                    if(tiles[pos_y][pos_x-1] == ' ' && divTiles[pos_y][pos_x-1].getAttribute('style') != 'background:gray'){ //left
+                        pos_x-- 
+                        clickedTile(divTiles[pos_y][pos_x], tiles[pos_y][pos_x], newAttribute)
+                        steps--
+                        direction = getRndInteger(3, 4)
+                    }
+                    else if(tiles[pos_y][pos_x-1] == i){
+                        pos_x-- 
+                        clickedTile(divTiles[pos_y][pos_x], tiles[pos_y][pos_x], newAttribute)
+                        pos_x++
+                        steps--
+                        direction = getRndInteger(3, 4)
+                    }
+                    else{
+                        direction = getRndInteger(3, 4)
+                    }
+                    break
+                case 3: //up
+                    if(tiles[pos_y+1][pos_x] == ' ' && divTiles[pos_y+1][pos_x].getAttribute('style') != 'background:gray'){ // up
+                        pos_y++ 
+                        clickedTile(divTiles[pos_y][pos_x], tiles[pos_y][pos_x], newAttribute)
+                        steps--
+                        direction = getRndInteger(1, 2)
+                    }
+                    else if(tiles[pos_y+1][pos_x] == i){
+                        pos_y++ 
+                        clickedTile(divTiles[pos_y][pos_x], tiles[pos_y][pos_x], newAttribute)
+                        pos_y--
+                        steps--
+                        direction = getRndInteger(1, 2)
+                    }
+                    else{
+                        direction = getRndInteger(1, 2)
+                    }
+                    break
+                case 4: // down
+                    if(tiles[pos_y-1][pos_x] == ' ' && divTiles[pos_y-1][pos_x].getAttribute('style') != 'background:gray'){ // down
+                        pos_y-- 
+                        clickedTile(divTiles[pos_y][pos_x], tiles[pos_y][pos_x], newAttribute)
+                        steps--
+                        direction = getRndInteger(1, 2)
+                    }
+                    else if(tiles[pos_y-1][pos_x] == i){
+                        pos_y-- 
+                        clickedTile(divTiles[pos_y][pos_x], tiles[pos_y][pos_x], newAttribute)
+                        pos_y++
+                        steps--
+                        direction = getRndInteger(1, 2)
+                    }
+                    else{
+                        direction = getRndInteger(1, 2)
+                    }
+                    break
+                default:
+                    steps = 0
+                    break
+            }
         }
     }
 }
+
+
