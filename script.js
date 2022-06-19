@@ -3,8 +3,39 @@
 let select = document.querySelector('#levels')
 let area = document.querySelector('.tiles')
 let bombsCount = document.querySelector('.bombs')
-let timer = document.querySelector('.time')
+let minutes = document.querySelector('.minutes')
+let seconds = document.querySelector('.seconds')
 select.addEventListener('change', func)
+
+
+//time handling
+let interval = 0
+let sec = 0
+let min = 0
+function timer(){
+    sec++
+
+    if(sec<10){
+        seconds.textContent = `0${sec}`
+    }
+    else if(sec<60){
+        seconds.textContent = `${sec}`
+    }
+    else{
+        sec = 0
+        min++
+        seconds.textContent = '00'
+        minutes.textContent = `${min}`
+    }
+}
+
+function timerStop(){
+    sec = 0
+    min = 0
+    seconds.textContent = '00'
+    minutes.textContent = '0'
+    clearInterval(interval)
+}
 
 // function call to create tiles on page refresh
 func()
@@ -30,26 +61,33 @@ function func(){
     // defining how many tiles generate, and their size
     switch(level){
         case 'Easy':
+            timerStop()
             howManyTiles = 11
             bombsCount.textContent = 10
             tilesSize = 8
             break
         case 'Medium':
+            timerStop()
             howManyTiles = 21
             bombsCount.textContent = 5
             tilesSize = 4
             break
         case 'Hard':
+            timerStop()
             bombsCount.textContent = 30
             howManyTiles = 21
             tilesSize = 4
             break
         default:
+            timerStop()
             howManyTiles = 11
             bombsCount.textContent = 20
             tilesSize = 8
             break
     }
+
+    // to check if all tiles are clicked excluding bomb tiles
+    let tilesRemain = Math.pow(howManyTiles-1, 2) - bombsCount.textContent
 
     // create two 2d arrays, one for divs, and one for setting bombs, and numbers
     // arrays a little bigger to prevent errors on clicking in border tiles
@@ -68,6 +106,7 @@ function func(){
     leftClickAtt = `background-color:gray; color:${numColor}; width:${tilesSize}%; height:${tilesSize}%; float:left; border: 0.05em solid; display: flex; justify-content: center; align-items: center;`
     //styling for flags
     attFlag = 'width: 60%; height: 70%;'
+    attBomb = 'width: 60%; height: 70%; background-color: red'
 
 
     // creating divTiles in loop
@@ -93,11 +132,15 @@ function func(){
                     case 0: // left click
                         if(!firstClick){
                             // randomizing bombs and setting them in array
-                            for(let k=0; k<bombsCount.textContent; k++) // number of bombs = number of flags
+                            let k = bombsCount.textContent
+                            while(k > 0) // number of bombs = number of flags
                             {   
                                 let bombY = getRndInteger(1, howManyTiles-1)
                                 let bombX = getRndInteger(1, howManyTiles-1)
-                                tiles[bombY][bombX] = 'b'
+                                if(bombX != x || bombY != y){
+                                    tiles[bombY][bombX] = 'b'
+                                    k--
+                                }
                             }
                             // new double loop for setting numbers only
                             for(let y2=1; y2<howManyTiles; y2++)
@@ -134,6 +177,8 @@ function func(){
                                     }
                                 }
                             }
+                            // timer start
+                            interval = setInterval(timer, 1000)
                         }
                         if(bool){
                             clicked = true
@@ -142,11 +187,13 @@ function func(){
                                 clickedTile(divTiles[y][x], tiles[y][x], leftClickAtt)
                                 revealTiles(y, x, divTiles, tiles, leftClickAtt)
                             }
-                            else{
-                                clickedTile(divTiles[y][x], tiles[y][x], leftClickAtt)
+                            else if(tiles[y][x] == 'b'){
+                                explosion(divTiles, tiles, howManyTiles, attBomb)
                             }
-                            //clickedTile(divTiles[y][x], tiles[y][x], att, leftClickAtt)
-                            //revealTiles(y, x, divTiles, tiles, att, leftClickAtt)
+                            else if(tiles[y][x] != 'b'){
+                                clickedTile(divTiles[y][x], tiles[y][x], leftClickAtt)
+                                //winCheck(divTiles, tiles, howManyTiles)
+                            }
                         }
                         firstClick = true
                         console.log(tiles, y, x)
@@ -294,3 +341,37 @@ function revealTiles(pos_y, pos_x, divTiles, tiles, newAttribute){
 }
 
 
+function explosion(divTiles, tiles, HowManyTiles, att){
+    for(let y=1; y<HowManyTiles; y++)
+    {   
+        for(let x=1; x<HowManyTiles; x++){
+            if(tiles[y][x] == 'b'){
+                let bomb = document.createElement('img')
+                bomb.src = "images/bomb.png"
+                bomb.setAttribute('style', att)
+                divTiles[y][x].appendChild(bomb)
+            }
+        }
+    }
+
+}
+
+// make win function and implement it in empty tile hit aswell
+function winCheck(divTiles, tiles, HowManyTiles){
+    let win = true
+    for(let y=1; y<HowManyTiles; y++)
+    {   
+        for(let x=1; x<HowManyTiles; x++){
+            if(divTiles[y][x].getAttribute('style') == 'background:salmon'){ 
+                if(tiles[y][x] != 'b'){
+                    win = false
+                }   
+            }
+        }
+    }
+
+    if(win){
+        alert('win')
+    }
+
+}
