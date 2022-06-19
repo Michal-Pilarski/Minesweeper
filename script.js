@@ -1,4 +1,5 @@
-// TODO game ending and bombs hit 
+// TODO game ending div, with time, 
+
 // html elements and listeners
 let select = document.querySelector('#levels')
 let area = document.querySelector('.tiles')
@@ -88,6 +89,7 @@ function func(){
 
     // to check if all tiles are clicked excluding bomb tiles
     let tilesRemain = Math.pow(howManyTiles-1, 2) - bombsCount.textContent
+    //console.log(tilesRemain)
 
     // create two 2d arrays, one for divs, and one for setting bombs, and numbers
     // arrays a little bigger to prevent errors on clicking in border tiles
@@ -186,15 +188,17 @@ function func(){
                             if(tiles[y][x] == ' '){
                                 clickedTile(divTiles[y][x], tiles[y][x], leftClickAtt)
                                 revealTiles(y, x, divTiles, tiles, leftClickAtt)
+                                winCheck(divTiles, tiles, howManyTiles, tilesRemain)
                             }
                             else if(tiles[y][x] == 'b'){
                                 explosion(divTiles, tiles, howManyTiles, attBomb)
                             }
                             else if(tiles[y][x] != 'b'){
                                 clickedTile(divTiles[y][x], tiles[y][x], leftClickAtt)
-                                //winCheck(divTiles, tiles, howManyTiles)
+                                winCheck(divTiles, tiles, howManyTiles, tilesRemain)
                             }
                         }
+                        //winCheck(divTiles, tiles, howManyTiles, tilesRemain)
                         firstClick = true
                         console.log(tiles, y, x)
                         break
@@ -250,7 +254,7 @@ function clickedTile(divTile, tile, newAttribute){
 // loop switching directions randomly and 'clicking' tile is not gray and if innerHTML of component is space
 // checking right, then up/down, then right/left, then up/down untill steps=0
 function revealTiles(pos_y, pos_x, divTiles, tiles, newAttribute){
-    let steps = 500
+    let steps = 700
     // directions
     // 1 - right  2 - left
     // 3 - up   4 - down
@@ -261,7 +265,7 @@ function revealTiles(pos_y, pos_x, divTiles, tiles, newAttribute){
         for(let i=1; i<9; i++){
             switch(direction){
                 case 1: //right
-                    if(tiles[pos_y][pos_x+1] == ' ' && divTiles[pos_y][pos_x+1].getAttribute('style') != 'background:gray'){ 
+                    if(tiles[pos_y][pos_x+1] == ' '){ 
                         pos_x++ 
                         clickedTile(divTiles[pos_y][pos_x], tiles[pos_y][pos_x], newAttribute)
                         steps--
@@ -279,7 +283,7 @@ function revealTiles(pos_y, pos_x, divTiles, tiles, newAttribute){
                     }
                     break
                 case 2: //left
-                    if(tiles[pos_y][pos_x-1] == ' ' && divTiles[pos_y][pos_x-1].getAttribute('style') != 'background:gray'){ //left
+                    if(tiles[pos_y][pos_x-1] == ' ' ){ //left
                         pos_x-- 
                         clickedTile(divTiles[pos_y][pos_x], tiles[pos_y][pos_x], newAttribute)
                         steps--
@@ -297,7 +301,7 @@ function revealTiles(pos_y, pos_x, divTiles, tiles, newAttribute){
                     }
                     break
                 case 3: //up
-                    if(tiles[pos_y+1][pos_x] == ' ' && divTiles[pos_y+1][pos_x].getAttribute('style') != 'background:gray'){ // up
+                    if(tiles[pos_y+1][pos_x] == ' '){ // up
                         pos_y++ 
                         clickedTile(divTiles[pos_y][pos_x], tiles[pos_y][pos_x], newAttribute)
                         steps--
@@ -315,7 +319,7 @@ function revealTiles(pos_y, pos_x, divTiles, tiles, newAttribute){
                     }
                     break
                 case 4: // down
-                    if(tiles[pos_y-1][pos_x] == ' ' && divTiles[pos_y-1][pos_x].getAttribute('style') != 'background:gray'){ // down
+                    if(tiles[pos_y-1][pos_x] == ' '){ // down
                         pos_y-- 
                         clickedTile(divTiles[pos_y][pos_x], tiles[pos_y][pos_x], newAttribute)
                         steps--
@@ -356,21 +360,18 @@ function explosion(divTiles, tiles, HowManyTiles, att){
 
 }
 
-// make win function and implement it in empty tile hit aswell
-function winCheck(divTiles, tiles, HowManyTiles){
-    let win = true
+// make win function and implement it in empty tile hit as well
+function winCheck(divTiles, tiles, HowManyTiles, tilesRemain){
     for(let y=1; y<HowManyTiles; y++)
     {   
         for(let x=1; x<HowManyTiles; x++){
-            if(divTiles[y][x].getAttribute('style') == 'background:salmon'){ 
-                if(tiles[y][x] != 'b'){
-                    win = false
-                }   
+            if(divTiles[y][x].style.backgroundColor == 'gray'){ 
+                console.log(tilesRemain)
+                tilesRemain-- 
             }
         }
     }
-
-    if(win){
+    if(tilesRemain < 1){
         alert('win')
     }
 
