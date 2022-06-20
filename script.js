@@ -31,11 +31,13 @@ function timer(){
 }
 
 function timerStop(){
+    let returnTime = `${min}.${sec}`
     sec = 0
     min = 0
     seconds.textContent = '00'
     minutes.textContent = '0'
     clearInterval(interval)
+    return returnTime
 }
 
 // function call to create tiles on page refresh
@@ -70,12 +72,12 @@ function func(){
         case 'Medium':
             timerStop()
             howManyTiles = 21
-            bombsCount.textContent = 5
+            bombsCount.textContent = 40
             tilesSize = 4
             break
         case 'Hard':
             timerStop()
-            bombsCount.textContent = 30
+            bombsCount.textContent = 60
             howManyTiles = 21
             tilesSize = 4
             break
@@ -89,7 +91,7 @@ function func(){
 
     // to check if all tiles are clicked excluding bomb tiles
     let tilesRemain = Math.pow(howManyTiles-1, 2) - bombsCount.textContent
-    //console.log(tilesRemain)
+    console.log(tilesRemain)
 
     // create two 2d arrays, one for divs, and one for setting bombs, and numbers
     // arrays a little bigger to prevent errors on clicking in border tiles
@@ -200,7 +202,6 @@ function func(){
                         }
                         //winCheck(divTiles, tiles, howManyTiles, tilesRemain)
                         firstClick = true
-                        console.log(tiles, y, x)
                         break
                     case 2: // right click
                         if(!clicked){
@@ -350,10 +351,24 @@ function explosion(divTiles, tiles, HowManyTiles, att){
     {   
         for(let x=1; x<HowManyTiles; x++){
             if(tiles[y][x] == 'b'){
+                disableListeners = true
                 let bomb = document.createElement('img')
                 bomb.src = "images/bomb.png"
                 bomb.setAttribute('style', att)
                 divTiles[y][x].appendChild(bomb)
+
+                let lostScreen = document.createElement('div')
+                lostScreen.setAttribute('style', 'height:25%; width:25%; position:absolute; margin:auto; top:0; bottom:0; left:0; right:0; text-align:center; background-color:green')
+                let lostText = document.createElement('span')
+                lostText.setAttribute('style', 'height:50%; width:100%; position:absolute; margin:auto; top:0; bottom:0; left:0; right:0; text-align:center; font-size: 1.5em; color:white;')
+                lostText.textContent = 'Congratulations, you blow yourself up'
+                let lostButton = document.createElement('button')
+                lostButton.setAttribute('style', 'width: 20%;height: 50%; position: relative; font-size: 0.5em; margin-left: 1%')
+                lostButton.textContent = 'reload'
+                lostButton.addEventListener('click', pageReload)
+                lostText.appendChild(lostButton)
+                lostScreen.appendChild(lostText)
+                area.appendChild(lostScreen)
             }
         }
     }
@@ -366,13 +381,29 @@ function winCheck(divTiles, tiles, HowManyTiles, tilesRemain){
     {   
         for(let x=1; x<HowManyTiles; x++){
             if(divTiles[y][x].style.backgroundColor == 'gray'){ 
-                console.log(tilesRemain)
                 tilesRemain-- 
             }
         }
-    }
+    } // end screen with time and restart button that refreshing page
     if(tilesRemain < 1){
-        alert('win')
+        let time = timerStop()
+        let winScreen = document.createElement('div')
+        winScreen.setAttribute('style', 'height:25%; width:25%; position:absolute; margin:auto; top:0; bottom:0; left:0; right:0; text-align:center; background-color:green')
+        let winText = document.createElement('span')
+        winText.setAttribute('style', 'height:50%; width:100%; position:absolute; margin:auto; top:0; bottom:0; left:0; right:0; text-align:center; font-size: 1.5em; color:white;')
+        winText.textContent = `Congratulations, you did it in time: ${time}`
+        let winButton = document.createElement('button')
+        winButton.setAttribute('style', 'width: 20%;height: 50%; position: relative; font-size: 0.5em; margin-left: 1%')
+        winButton.textContent = 'reload'
+        winButton.addEventListener('click', pageReload)
+        winText.appendChild(winButton)
+        winScreen.appendChild(winText)
+        area.appendChild(winScreen)
+        console.log(time)
     }
 
+}
+
+function pageReload(){
+    window.location.reload();
 }
