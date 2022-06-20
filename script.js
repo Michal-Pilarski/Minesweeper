@@ -1,4 +1,4 @@
-// TODO game ending div, with time, 
+// TODO color changing etc, better styling
 
 // html elements and listeners
 let select = document.querySelector('#levels')
@@ -66,18 +66,18 @@ function func(){
         case 'Easy':
             timerStop()
             howManyTiles = 11
-            bombsCount.textContent = 10
+            bombsCount.textContent = 15
             tilesSize = 8
             break
         case 'Medium':
             timerStop()
             howManyTiles = 21
-            bombsCount.textContent = 40
+            bombsCount.textContent = 50
             tilesSize = 4
             break
         case 'Hard':
             timerStop()
-            bombsCount.textContent = 60
+            bombsCount.textContent = 80
             howManyTiles = 21
             tilesSize = 4
             break
@@ -141,9 +141,12 @@ function func(){
                             {   
                                 let bombY = getRndInteger(1, howManyTiles-1)
                                 let bombX = getRndInteger(1, howManyTiles-1)
-                                if(bombX != x || bombY != y){
-                                    tiles[bombY][bombX] = 'b'
-                                    k--
+                                // at least square of empty tiles around first clicked tile
+                                if(bombX != x && bombX != x+1 && bombX != x-1){
+                                    if(bombX != y && bombX != y+1 && bombX != y-1){
+                                        tiles[bombY][bombX] = 'b'
+                                        k--
+                                    }
                                 }
                             }
                             // new double loop for setting numbers only
@@ -252,10 +255,10 @@ function clickedTile(divTile, tile, newAttribute){
 }
 
 // if tile without value has been hitted
-// loop switching directions randomly and 'clicking' tile is not gray and if innerHTML of component is space
+// loop switching directions randomly and 'clicking' if innerHTML of component is space or first number
 // checking right, then up/down, then right/left, then up/down untill steps=0
 function revealTiles(pos_y, pos_x, divTiles, tiles, newAttribute){
-    let steps = 700
+    let steps = 2000
     // directions
     // 1 - right  2 - left
     // 3 - up   4 - down
@@ -282,6 +285,25 @@ function revealTiles(pos_y, pos_x, divTiles, tiles, newAttribute){
                     else{
                         direction = getRndInteger(3, 4)
                     }
+
+                    if(tiles[pos_y+1][pos_x+1] == i ){ // right down check for numbers
+                        pos_x++ 
+                        pos_y++
+                        clickedTile(divTiles[pos_y][pos_x], tiles[pos_y][pos_x], newAttribute)
+                        pos_x--
+                        pos_y--
+                        steps--
+                        direction = getRndInteger(3, 4)
+                    }
+                    if(tiles[pos_y-1][pos_x+1] == i ){ // right up check for numbers
+                        pos_x++ 
+                        pos_y--
+                        clickedTile(divTiles[pos_y][pos_x], tiles[pos_y][pos_x], newAttribute)
+                        pos_x--
+                        pos_y++
+                        steps--
+                        direction = getRndInteger(3, 4)
+                    }
                     break
                 case 2: //left
                     if(tiles[pos_y][pos_x-1] == ' ' ){ //left
@@ -300,9 +322,28 @@ function revealTiles(pos_y, pos_x, divTiles, tiles, newAttribute){
                     else{
                         direction = getRndInteger(3, 4)
                     }
+
+                    if(tiles[pos_y+1][pos_x-1] == i ){ // left down check for numbers
+                        pos_x--
+                        pos_y++
+                        clickedTile(divTiles[pos_y][pos_x], tiles[pos_y][pos_x], newAttribute)
+                        pos_x++
+                        pos_y--
+                        steps--
+                        direction = getRndInteger(3, 4)
+                    }
+                    if(tiles[pos_y-1][pos_x-1] == i ){ // left up check for numbers
+                        pos_x--
+                        pos_y--
+                        clickedTile(divTiles[pos_y][pos_x], tiles[pos_y][pos_x], newAttribute)
+                        pos_x++
+                        pos_y++
+                        steps--
+                        direction = getRndInteger(3, 4)
+                    }
                     break
                 case 3: //up
-                    if(tiles[pos_y+1][pos_x] == ' '){ // up
+                    if(tiles[pos_y+1][pos_x] == ' '){ // down
                         pos_y++ 
                         clickedTile(divTiles[pos_y][pos_x], tiles[pos_y][pos_x], newAttribute)
                         steps--
@@ -320,7 +361,7 @@ function revealTiles(pos_y, pos_x, divTiles, tiles, newAttribute){
                     }
                     break
                 case 4: // down
-                    if(tiles[pos_y-1][pos_x] == ' '){ // down
+                    if(tiles[pos_y-1][pos_x] == ' '){ // up
                         pos_y-- 
                         clickedTile(divTiles[pos_y][pos_x], tiles[pos_y][pos_x], newAttribute)
                         steps--
@@ -342,6 +383,7 @@ function revealTiles(pos_y, pos_x, divTiles, tiles, newAttribute){
                     break
             }
         }
+        console.log('1')
     }
 }
 
@@ -382,6 +424,7 @@ function winCheck(divTiles, tiles, HowManyTiles, tilesRemain){
         for(let x=1; x<HowManyTiles; x++){
             if(divTiles[y][x].style.backgroundColor == 'gray'){ 
                 tilesRemain-- 
+                console.log(tilesRemain)
             }
         }
     } // end screen with time and restart button that refreshing page
@@ -399,7 +442,6 @@ function winCheck(divTiles, tiles, HowManyTiles, tilesRemain){
         winText.appendChild(winButton)
         winScreen.appendChild(winText)
         area.appendChild(winScreen)
-        console.log(time)
     }
 
 }
