@@ -66,18 +66,18 @@ function func(){
         case 'Easy':
             timerStop()
             howManyTiles = 11
-            bombsCount.textContent = 10
+            bombsCount.textContent = 15
             tilesSize = 8
             break
         case 'Medium':
             timerStop()
             howManyTiles = 21
-            bombsCount.textContent = 50
+            bombsCount.textContent = 40
             tilesSize = 4
             break
         case 'Hard':
             timerStop()
-            bombsCount.textContent = 80
+            bombsCount.textContent = 70
             howManyTiles = 21
             tilesSize = 4
             break
