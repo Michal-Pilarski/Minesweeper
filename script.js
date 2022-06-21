@@ -66,7 +66,7 @@ function func(){
         case 'Easy':
             timerStop()
             howManyTiles = 11
-            bombsCount.textContent = 15
+            bombsCount.textContent = 10
             tilesSize = 8
             break
         case 'Medium':
@@ -90,8 +90,7 @@ function func(){
     }
 
     // to check if all tiles are clicked excluding bomb tiles
-    let tilesRemain = Math.pow(howManyTiles-1, 2) - bombsCount.textContent
-    console.log(tilesRemain)
+    let numberOfBombs = bombsCount.textContent
 
     // create two 2d arrays, one for divs, and one for setting bombs, and numbers
     // arrays a little bigger to prevent errors on clicking in border tiles
@@ -137,6 +136,8 @@ function func(){
                         if(!firstClick){
                             // randomizing bombs and setting them in array
                             let k = bombsCount.textContent
+                            // bomby się nakładaja na siebie
+                            let bombsCoordinates = []
                             while(k > 0) // number of bombs = number of flags
                             {   
                                 let bombY = getRndInteger(1, howManyTiles-1)
@@ -193,14 +194,14 @@ function func(){
                             if(tiles[y][x] == ' '){
                                 clickedTile(divTiles[y][x], tiles[y][x], leftClickAtt)
                                 revealTiles(y, x, divTiles, tiles, leftClickAtt)
-                                winCheck(divTiles, tiles, howManyTiles, tilesRemain)
+                                //winCheck(divTiles, tiles, howManyTiles, tilesRemain)
                             }
                             else if(tiles[y][x] == 'b'){
                                 explosion(divTiles, tiles, howManyTiles, attBomb)
                             }
                             else if(tiles[y][x] != 'b'){
                                 clickedTile(divTiles[y][x], tiles[y][x], leftClickAtt)
-                                winCheck(divTiles, tiles, howManyTiles, tilesRemain)
+                                winCheck(divTiles, tiles, howManyTiles, numberOfBombs)
                             }
                         }
                         //winCheck(divTiles, tiles, howManyTiles, tilesRemain)
@@ -209,14 +210,16 @@ function func(){
                     case 2: // right click
                         if(!clicked){
                             if(bool){
-                                //making flag on right click
-                                let flag = document.createElement('img')
-                                flag.src = "images/flag_icon.png"
-                                flag.setAttribute('style', attFlag)
-                                divTiles[y][x].appendChild(flag)
-                                bool = false
-                                //flags counter
-                                bombsCount.textContent--
+                                if(divTiles[y][x].style.backgroundColor == 'salmon'){
+                                    //making flag on right click
+                                    let flag = document.createElement('img')
+                                    flag.src = "images/flag_icon.png"
+                                    flag.setAttribute('style', attFlag)
+                                    divTiles[y][x].appendChild(flag)
+                                    bool = false
+                                    //flags counter
+                                    bombsCount.textContent--
+                                }
                             }
                             else{
                                 divTiles[y][x].innerHTML = ''
@@ -237,7 +240,7 @@ function func(){
         area.appendChild(clear)
     }
 
-    console.log(tiles)
+    //console.log(tiles)
 }
 
 
@@ -397,6 +400,7 @@ function explosion(divTiles, tiles, HowManyTiles, att){
                 let bomb = document.createElement('img')
                 bomb.src = "images/bomb.png"
                 bomb.setAttribute('style', att)
+                divTiles[y][x].innerHTML = ''
                 divTiles[y][x].appendChild(bomb)
 
                 let lostScreen = document.createElement('div')
@@ -418,7 +422,9 @@ function explosion(divTiles, tiles, HowManyTiles, att){
 }
 
 // make win function and implement it in empty tile hit as well
-function winCheck(divTiles, tiles, HowManyTiles, tilesRemain){
+function winCheck(divTiles, tiles, HowManyTiles, numberOfBombs){
+    let tilesRemain = Math.pow(HowManyTiles-1, 2) - numberOfBombs
+    console.log(tilesRemain)
     for(let y=1; y<HowManyTiles; y++)
     {   
         for(let x=1; x<HowManyTiles; x++){
@@ -427,7 +433,8 @@ function winCheck(divTiles, tiles, HowManyTiles, tilesRemain){
                 console.log(tilesRemain)
             }
         }
-    } // end screen with time and restart button that refreshing page
+    } 
+    // end screen with time and restart button that refreshing page
     if(tilesRemain < 1){
         let time = timerStop()
         let winScreen = document.createElement('div')
@@ -442,6 +449,19 @@ function winCheck(divTiles, tiles, HowManyTiles, tilesRemain){
         winText.appendChild(winButton)
         winScreen.appendChild(winText)
         area.appendChild(winScreen)
+        for(let y=1; y<HowManyTiles; y++){
+        
+            for(let x=1; x<HowManyTiles; x++){
+                if(tiles[y][x] == 'b'){
+                    disableListeners = true
+                    let bomb = document.createElement('img')
+                    bomb.src = "images/bomb.png"
+                    bomb.setAttribute('style', att)
+                    divTiles[y][x].innerHTML = ''
+                    divTiles[y][x].appendChild(bomb)
+                }
+            }
+        }
     }
 
 }
